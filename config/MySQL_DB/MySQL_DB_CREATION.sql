@@ -1,0 +1,36 @@
+CREATE DATABASE IF NOT EXISTS `MYSQL_API_DB`;
+
+USE `MYSQL_API_DB`;
+
+CREATE TABLE IF NOT EXISTS `MYSQL_API_DB`.`users` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(64) NOT NULL,
+  `email` VARCHAR(128) NOT NULL,
+  `password` VARCHAR(128) NOT NULL,
+  `usertype` INT NOT NULL DEFAULT 0,
+  `active` INT NOT NULL DEFAULT 0,
+  `created` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `MYSQL_API_DB`.`posts` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(128) NOT NULL,
+  `description` VARCHAR(4096) NOT NULL,
+  `photopath` VARCHAR(4096) NOT NULL,
+  `thumbnail` VARCHAR(4096) NOT NULL,
+  `active` INT NOT NULL DEFAULT 0,
+  `created` DATETIME NOT NULL,
+  `fk_userid` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  INDEX `post to users_idx` (`fk_userid` ASC) VISIBLE,
+  CONSTRAINT `post to users`
+    FOREIGN KEY (`fk_userid`)
+    REFERENCES `MYSQL_API_DB`.`users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
