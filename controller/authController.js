@@ -1,7 +1,9 @@
 const db = require("../config/dbConfig");
 const bcrypt = require("bcryptjs");
+const CatchAsync = require("../utility/CatchAsync");
+const AppError = require("../utility/AppError");
 
-exports.signup = async (req, res, next) => {
+exports.signup = CatchAsync(async (req, res, next) => {
   const { username, email, password } = req.body;
   //Validate data, if bad send back response
   // res.direct('/signup)
@@ -10,10 +12,12 @@ exports.signup = async (req, res, next) => {
       if (results && results.length == 0) {
         return db.execute("SELECT * FROM users WHERE email=?", [email]);
       } else {
-        res.status(200).json({
-          status: "fail",
-          error: `${username} already exist`,
-        });
+        return next(
+          new AppError(
+            `${username} is associated with an existing account. Please login.`,
+            401
+          )
+        );
       }
     })
     .then(([results, fields]) => {
@@ -47,7 +51,7 @@ exports.signup = async (req, res, next) => {
     .catch((err) => {
       console.log(err);
     });
-};
+});
 
 exports.login = async (req, res, next) => {
   const { username, password } = req.body;
