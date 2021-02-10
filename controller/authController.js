@@ -2,7 +2,7 @@ const db = require("../config/dbConfig");
 const bcrypt = require("bcryptjs");
 
 exports.signup = async (req, res, next) => {
-  const { username, email, password, confirmPassword } = req.body;
+  const { username, email, password } = req.body;
   //Validate data, if bad send back response
   // res.direct('/signup)
   db.execute("SELECT * FROM users WHERE username=?", [username])
@@ -22,20 +22,14 @@ exports.signup = async (req, res, next) => {
       } else {
         res.status(200).json({
           status: "fail",
-          error: "Email already exist",
+          error: "Email already exist. Please login.",
         });
       }
     })
     .then((hashedPassword) => {
       let baseSQL =
-        "INSERT INTO users (username, email, password, confirmPassword, created) VALUES (?, ?, ?, ?, now());";
-
-      return db.execute(baseSQL, [
-        username,
-        email,
-        hashedPassword,
-        hashedPassword,
-      ]);
+        "INSERT INTO users (username, email, password, created) VALUES (?, ?, ?, now());";
+      return db.execute(baseSQL, [username, email, hashedPassword]);
     })
     .then(([results, fields]) => {
       if (results && results.affectedRows) {
@@ -46,7 +40,7 @@ exports.signup = async (req, res, next) => {
       } else {
         res.status(500).json({
           status: "fail",
-          error: "Server error, user could not be created",
+          error: `"Server error, user could not be created"`,
         });
       }
     })
